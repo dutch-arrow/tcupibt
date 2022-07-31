@@ -1,0 +1,15 @@
+{"trace": "off", 
+ "state": [
+		{"device": "light1",  "state": "off", "hours_on": 0, "manual": "no"},
+		{"device": "light2",  "state": "off", "hours_on": 0, "manual": "no"},
+		{"device": "light3",  "state": "off", "hours_on": 0, "manual": "no"},
+		{"device": "light4",  "state": "off", "hours_on": 0, "manual": "no"},
+		{"device": "uvlight", "state": "off", "hours_on": 4400, "manual": "no"},
+		{"device": "light6",  "state": "off", "hours_on": 0, "manual": "no"},
+		{"device": "pump",    "state": "off", "hours_on": 0, "manual": "no"},
+		{"device": "sprayer", "state": "off", "hours_on": 0, "manual": "no"},
+		{"device": "mist",    "state": "off", "hours_on": 0, "manual": "no"},
+		{"device": "fan_in",  "state": "off", "hours_on": 0, "manual": "no"},
+		{"device": "fan_out", "state": "off", "hours_on": 0, "manual": "no"}
+	]
+}

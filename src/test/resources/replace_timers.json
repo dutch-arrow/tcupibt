@@ -1,0 +1,54 @@
+{"timers":
+	[
+	    {
+	        "device": "sprayer",
+	        "hour_off": 0,
+	        "hour_on": 10,
+	        "index": 1,
+	        "minute_off": 0,
+	        "minute_on": 5,
+	        "period": 30,
+	        "repeat": 1
+	    },
+	    {
+	        "device": "sprayer",
+	        "hour_off": 0,
+	        "hour_on": 15,
+	        "index": 2,
+	        "minute_off": 0,
+	        "minute_on": 5,
+	        "period": 30,
+	        "repeat": 1
+	    },
+	    {
+	        "device": "sprayer",
+	        "hour_off": 0,
+	        "hour_on": 0,
+	        "index": 3,
+	        "minute_off": 0,
+	        "minute_on": 5,
+	        "period": 30,
+	        "repeat": 0
+	    },
+	    {
+	        "device": "sprayer",
+	        "hour_off": 0,
+	        "hour_on": 0,
+	        "index": 4,
+	        "minute_off": 0,
+	        "minute_on": 5,
+	        "period": 30,
+	        "repeat": 0
+	    },
+	    {
+	        "device": "sprayer",
+	        "hour_off": 0,
+	        "hour_on": 0,
+	        "index": 5,
+	        "minute_off": 0,
+	        "minute_on": 5,
+	        "period": 30,
+	        "repeat": 0
+	    }
+	]
+}

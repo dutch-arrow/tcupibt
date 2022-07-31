@@ -1,0 +1,21 @@
+{
+    "actions": [
+        {
+            "device": "fan_in",
+            "on_period": 300
+        },
+        {
+            "device": "fan_out",
+            "on_period": 300
+        },
+        {
+            "device": "no device",
+            "on_period": 0
+        },
+        {
+            "device": "no device",
+            "on_period": 0
+        }
+    ],
+    "delay": 15
+}
