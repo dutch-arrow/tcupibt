@@ -9,6 +9,8 @@
 
 package nl.das.terraria.rest;
 
+import java.util.UUID;
+
 import javax.json.JsonObject;
 
 /**
@@ -16,9 +18,24 @@ import javax.json.JsonObject;
  */
 public class Command {
 
+	private UUID msgId;
 	private String cmd;
 	private JsonObject data;
 
+	public Command() { this.msgId = UUID.randomUUID(); }
+
+	public Command(String cmd, JsonObject data) {
+		this.msgId = UUID.randomUUID();
+		this.cmd = cmd;
+		this.data = data;
+	}
+
+	public UUID getMsgId () {
+		return this.msgId;
+	}
+	public void setMsgId (UUID msgId) {
+		this.msgId = msgId;
+	}
 	public String getCmd () {
 		return this.cmd;
 	}

@@ -8,19 +8,15 @@
 
 package nl.das.terraria;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Properties;
 
 import javax.bluetooth.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import nl.das.terraria.hw.LCD;
 import nl.das.terraria.objects.Terrarium;
@@ -28,26 +24,32 @@ import nl.das.terraria.rest.BTServer;
 
 public class TCU {
 
-	private static Logger log = LoggerFactory.getLogger(TCU.class);
-	private static DateTimeFormatter dtfmt = DateTimeFormatter.ofPattern("HH:mm:ss");
-
 	public static void main (String[] args) throws InterruptedException {
+		// Read property file
+		Properties props = new Properties();
+		try {
+			props.load(new FileInputStream("config.properties"));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
 		LocalDateTime now = LocalDateTime.now();
-		System.out.println(now.format(dtfmt) + " Start Initialization ...");
-		System.err.println(now.format(dtfmt) + " System started.");
+		System.out.println(Util.getDateTimeString() + "Start Initialization ...");
+		System.err.println(Util.getDateTimeString() + "System started.");
 
 		// Initialize the LCD
 		LCD lcd = new LCD();
 		lcd.init(2, 16);
 		lcd.write(0, "Initialize....");
 
-		System.out.println(now.format(dtfmt) + " Starting the Bluetooth service");
+		System.out.println(Util.getDateTimeString() + " Starting the Bluetooth service");
 		Thread svr = new Thread() {
 		    @Override
 			public void run(){
 		        try {
-					new BTServer("tcu-test", new UUID("2D26618601FB47C28D9F10B8EC891363", false)).start();
+					new BTServer(props.getProperty("host"), new UUID(props.getProperty("uuid"), false)).start();
 				} catch (IOException e) {
+					System.out.println(Util.getDateTimeString() + e.getMessage());
 					e.printStackTrace();
 				};
 		      }
@@ -80,6 +82,7 @@ public class TCU {
 			}
 		} catch (NoSuchFileException e) {
 		} catch (IOException e) {
+			System.out.println(Util.getDateTimeString() + e.getMessage());
 			e.printStackTrace();
 		}
 		// Initialize the Temperature sensors
@@ -87,12 +90,7 @@ public class TCU {
 		int tterr = terrarium.getTerrariumTemperature();
 		int troom =  terrarium.getRoomTemperature();
 		lcd.displayLine1(troom, tterr);
-		String ip="";
-		try {
-			ip = InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		String ip = "App: " + props.getProperty("host");
 		lcd.write(1, ip);
 		// Check timers if devices should be on
 		terrarium.initTimers(now);
@@ -102,7 +100,7 @@ public class TCU {
 		int currentMin = now.getMinute();
 		int currentHour = now.getHour();
 		// Start the loop
-		System.out.println(now.format(dtfmt) + " Initialization done, start loop");
+		System.out.println(Util.getDateTimeString() + " Initialization done, start loop");
 		while (true) {
 			now = LocalDateTime.now();
 			terrarium.setNow(now);

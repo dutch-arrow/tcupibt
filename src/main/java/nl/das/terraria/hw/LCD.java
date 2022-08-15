@@ -69,7 +69,7 @@ public class LCD {
 		if (!this.notConnected) {
 			this.lcd.clear(0);
 			char degrees = 0xDF;
-			this.lcd.write(0, "Kmr:" + troom + degrees + "C Trm:" + tterr + degrees + "C");
+			this.lcd.write(0, String.format("K:%2d%cC T:%2d%cC", troom, degrees, tterr, degrees));
 		}
 	}
 }

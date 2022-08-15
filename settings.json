@@ -121,11 +121,11 @@
         "actions": [
             {
                 "device": "fan_in",
-                "on_period": 900
+                "on_period": 300
             },
             {
                 "device": "fan_out",
-                "on_period": 900
+                "on_period": 300
             },
             {
                 "device": "no device",

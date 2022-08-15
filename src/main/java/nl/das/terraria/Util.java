@@ -64,6 +64,10 @@ public class Util {
 		return LocalDateTime.ofEpochSecond(epochseconds, 0, ZoneId.systemDefault().getRules().getOffset(Instant.now()));
 	}
 
+	public static String getDateTimeString() {
+		return LocalDateTime.now().format(dtfmt) + " ";
+	}
+
 	public static List<String> listTraceFiles(String folder, String prefix) throws IOException {
 	    List<String> fileList = new ArrayList<>();
 	    Files.walkFileTree(Paths.get(folder), new SimpleFileVisitor<Path>() {

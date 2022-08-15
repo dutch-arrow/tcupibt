@@ -14,6 +14,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -25,8 +26,10 @@ import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.LocalDevice;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.UUID;
+import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
@@ -62,7 +65,7 @@ public class BTServer {
 			this.sc = this.scn.acceptAndOpen();
 			// New client connection accepted; get a handle on it
 			RemoteDevice rd = RemoteDevice.getRemoteDevice(this.sc);
-			System.out.println("New client connection... " + rd.getFriendlyName(false));
+			System.out.println(Util.getDateTimeString() + "New client connection... " + rd.getFriendlyName(false));
 			// Read input message, in this example a String
 			DataInputStream dataIn = this.sc.openDataInputStream();
 			DataOutputStream dataOut = this.sc.openDataOutputStream();
@@ -76,7 +79,7 @@ public class BTServer {
 					sb.append((char)chr);
 				}
 			}
-			System.out.println("Connection closed");
+			System.out.println(Util.getDateTimeString() + "Connection closed");
 		}
 	}
 
@@ -88,11 +91,13 @@ public class BTServer {
 		Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
 		// Analyze command
 		Command cmd = jsonb.fromJson(command, Command.class);
-		String res;
+		Response res = new Response(cmd.getMsgId(), cmd.getCmd());
 		try {
 			switch(cmd.getCmd()) {
 			case "getSensors": {
-				res = jsonb.toJson(Terrarium.getInstance().getSensors());
+				JsonReader jsonReader = Json.createReader(new StringReader(jsonb.toJson(Terrarium.getInstance().getSensors())));
+				JsonObject object = jsonReader.readObject();
+				res.setResponse(object);
 				break;
 			}
 			case "setSensors": {
@@ -105,37 +110,44 @@ public class BTServer {
 					throw new CommandException("Integer parameter 'terrtemp' not found.");
 				}
 				Terrarium.getInstance().setSensors(rt, tt);
-				res = "{}";
 				break;
 			}
 			case "setTestOff": {
 				Terrarium.getInstance().setTestOff();
-				res = "{}";
 				break;
 			}
 			case "getState": {
-				res = Terrarium.getInstance().getState();
+				JsonReader jsonReader = Json.createReader(new StringReader(Terrarium.getInstance().getState()));
+				JsonObject object = jsonReader.readObject();
+				res.setResponse(object);
 				break;
 			}
 			case "setDeviceOn": {
+				if (cmd.getData() == null) {
+					throw new CommandException("No data found.");
+				}
 				String prm = cmd.getData().getString("device", "");
 				if( prm.length() == 0) {
 					throw new CommandException("String parameter 'device' not found.");
 				}
 				Terrarium.getInstance().setDeviceOn(prm, -1);
-				res = "{}";
 				break;
 			}
 			case "setDeviceOff": {
+				if (cmd.getData() == null) {
+					throw new CommandException("No data found.");
+				}
 				String prm = cmd.getData().getString("device", "");
 				if( prm.length() == 0) {
 					throw new CommandException("String parameter 'device' not found.");
 				}
 				Terrarium.getInstance().setDeviceOff(prm);
-				res = "{}";
 				break;
 			}
 			case "setDeviceOnFor": {
+				if (cmd.getData() == null) {
+					throw new CommandException("No data found.");
+				}
 				String prm = cmd.getData().getString("device", "");
 				if( prm.length() == 0) {
 					throw new CommandException("String parameter 'device' not found.");
@@ -148,28 +160,34 @@ public class BTServer {
 					throw new CommandException("Integer parameter 'period' must be > 0 and < 3600 seconds.");
 				}
 				Terrarium.getInstance().setDeviceOn(prm, per);
-				res = "{}";
 				break;
 			}
 			case "setDeviceManualOn": {
+				if (cmd.getData() == null) {
+					throw new CommandException("No data found.");
+				}
 				String prm = cmd.getData().getString("device", "");
 				if( prm.length() == 0) {
 					throw new CommandException("String parameter 'device' not found.");
 				}
 				Terrarium.getInstance().setDeviceManualOn(prm);
-				res = "{}";
 				break;
 			}
 			case "setDeviceManualOff": {
+				if (cmd.getData() == null) {
+					throw new CommandException("No data found.");
+				}
 				String prm = cmd.getData().getString("device", "");
 				if( prm.length() == 0) {
 					throw new CommandException("String parameter 'device' not found.");
 				}
 				Terrarium.getInstance().setDeviceManualOff(prm);
-				res = "{}";
 				break;
 			}
 			case "setLifecycleCounter": {
+				if (cmd.getData() == null) {
+					throw new CommandException("No data found.");
+				}
 				String prm = cmd.getData().getString("device", "");
 				if( prm.length() == 0) {
 					throw new CommandException("String parameter 'device' not found.");
@@ -182,34 +200,42 @@ public class BTServer {
 					throw new CommandException("Integer parameter 'period' must be > 0 hours.");
 				}
 				Terrarium.getInstance().setLifecycleCounter(prm, hrs);
-				res = "{}";
 				break;
 			}
 			case "getProperties": {
-				res = Terrarium.getInstance().getProperties();
+				JsonReader jsonReader = Json.createReader(new StringReader(Terrarium.getInstance().getProperties()));
+				JsonObject object = jsonReader.readObject();
+				res.setResponse(object);
 				break;
 			}
 			case "setTraceOn": {
 				Terrarium.getInstance().setNow(LocalDateTime.now());
 				Terrarium.getInstance().setTrace(true);
-				res = "{}";
 				break;
 			}
 			case "setTraceOff": {
 				Terrarium.getInstance().setTrace(false);
-				res = "{}";
 				break;
 			}
 			case "getTimersForDevice": {
+				if (cmd.getData() == null) {
+					throw new CommandException("No data found.");
+				}
 				String prm = cmd.getData().getString("device", "");
 				if( prm.length() == 0) {
 					throw new CommandException("String parameter 'device' not found.");
 				}
-				res = jsonb.toJson(Terrarium.getInstance().getTimersForDevice(prm));
+				JsonReader jsonReader = Json.createReader(new StringReader("{\"timers\":" + jsonb.toJson(Terrarium.getInstance().getTimersForDevice(prm)) + "}"));
+				JsonObject object = jsonReader.readObject();
+				res.setResponse(object);
 				break;
 			}
 			case "replaceTimers": {
-				JsonArray ja = cmd.getData().getJsonArray("timers");
+				if (cmd.getData() == null) {
+					throw new CommandException("No data found.");
+				}
+				JsonReader jsonReader = Json.createReader(new StringReader(cmd.getData().getString("timers")));
+				JsonArray ja = jsonReader.readArray();
 				if (ja == null) {
 					throw new CommandException("JsonArray parameter 'timers' does not contain an array of Timer objects.");
 				}
@@ -217,7 +243,6 @@ public class BTServer {
 					Timer[] timers = jsonb.fromJson(ja.toString(), Timer[].class);
 					Terrarium.getInstance().replaceTimers(timers);
 					Terrarium.getInstance().saveSettings();
-					res = "{}";
 				} catch (JsonbException e) {
 					throw new CommandException("JsonArray parameter 'timers' does not contain an array of Timer json objects.");
 				}
@@ -228,11 +253,14 @@ public class BTServer {
 				if( prm == 0) {
 					throw new CommandException("Integer parameter 'rulesetnr' not found.");
 				}
-				res = jsonb.toJson(Terrarium.getInstance().getRuleset(prm));
+				JsonReader jsonReader = Json.createReader(new StringReader(jsonb.toJson(Terrarium.getInstance().getRuleset(prm))));
+				JsonObject object = jsonReader.readObject();
+				res.setResponse(object);
 				break;
 			}
 			case "saveRuleset": {
-				JsonObject obj = cmd.getData().getJsonObject("ruleset");
+				JsonReader jsonReader = Json.createReader(new StringReader(cmd.getData().getString("ruleset")));
+				JsonObject obj = jsonReader.readObject();
 				if (obj == null) {
 					throw new CommandException("JsonObject parameter 'ruleset' not found.");
 				}
@@ -245,14 +273,15 @@ public class BTServer {
 					ruleset = jsonb.fromJson(obj.toString(), Ruleset.class);
 					Terrarium.getInstance().replaceRuleset(prm, ruleset);
 					Terrarium.getInstance().saveSettings();
-					res = "{}";
 				} catch (JsonbException e) {
 					throw new CommandException("JsonObject parameter 'ruleset' does not contain a Ruleset json object.");
 				}
 				break;
 			}
 			case "getSprayerRule": {
-				res = jsonb.toJson(Terrarium.getInstance().getSprayerRule());
+				JsonReader jsonReader = Json.createReader(new StringReader(jsonb.toJson(Terrarium.getInstance().getSprayerRule())));
+				JsonObject object = jsonReader.readObject();
+				res.setResponse(object);
 				break;
 			}
 			case "setSprayerRule": {
@@ -260,7 +289,6 @@ public class BTServer {
 					SprayerRule sprayerRule = jsonb.fromJson(cmd.getData().toString(), SprayerRule.class);
 					Terrarium.getInstance().setSprayerRule(sprayerRule);;
 					Terrarium.getInstance().saveSettings();
-					res = "{}";
 				} catch (JsonbException e) {
 					throw new CommandException("Data does not contain a SprayerRule json object.");
 				}
@@ -269,13 +297,17 @@ public class BTServer {
 			case "getTempTracefiles": {
 				List<String> files = new ArrayList<>();
 				files = Util.listTraceFiles(Terrarium.traceFolder, "temp_");
-				res = jsonb.toJson(files);
+				JsonReader jsonReader = Json.createReader(new StringReader("{\"files\":" + jsonb.toJson(files) + "}"));
+				JsonObject object = jsonReader.readObject();
+				res.setResponse(object);
 				break;
 			}
 			case "getStateTracefiles": {
 				List<String> files = new ArrayList<>();
 				files = Util.listTraceFiles(Terrarium.traceFolder, "state_");
-				res = jsonb.toJson(files);
+				JsonReader jsonReader = Json.createReader(new StringReader("{\"files\":" + jsonb.toJson(files) + "}"));
+				JsonObject object = jsonReader.readObject();
+				res.setResponse(object);
 				break;
 			}
 			case "getTemperatureFile": {
@@ -285,7 +317,9 @@ public class BTServer {
 					throw new CommandException("String parameter 'fname' not found.");
 				}
 				content = Files.readString(Paths.get(Terrarium.traceFolder + "/" + cmd.getData().getString("fname")));
-				res = content;
+				JsonReader jsonReader = Json.createReader(new StringReader("{\"content\":\"" + content.replace("\n", "\\n") + "\"}"));
+				JsonObject object = jsonReader.readObject();
+				res.setResponse(object);
 				break;
 			}
 			case "getStateFile": {
@@ -295,27 +329,33 @@ public class BTServer {
 					throw new CommandException("String parameter 'fname' not found.");
 				}
 				content = Files.readString(Paths.get(Terrarium.traceFolder + "/" + cmd.getData().getString("fname")));
-				res = content;
+				JsonReader jsonReader = Json.createReader(new StringReader("{\"content\":\"" + content.replace("\n", "\\n") + "\"}"));
+				JsonObject object = jsonReader.readObject();
+				res.setResponse(object);
 				break;
 			}
 			default:
 				throw new CommandException("Command '" + cmd.getCmd() + "' is not implemented.");
 			}
 			// Construct response
-			out.write(res.getBytes());
+			out.write(jsonb.toJson(res).getBytes());
 			out.write(0x03); // ETX character
 		} catch (Exception e) {
 			if (e instanceof CommandException) {
 				System.err.println(e.getMessage());
-				res = "{\"error\":\"" + e.getMessage() + "\"}";
+				JsonReader jsonReader = Json.createReader(new StringReader("{\"error\":\"" + e.getMessage() + "\"}"));
+				JsonObject object = jsonReader.readObject();
+				res.setResponse(object);
 			} else {
 				e.printStackTrace();
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				e.printStackTrace(pw);
-				res = "{\"error\":\"" + sw.toString() + "\"}";
+				JsonReader jsonReader = Json.createReader(new StringReader("{\"error\":\"" + sw.toString().replace("\n", "\\n").replace("\t", "    ") + "\"}"));
+				JsonObject object = jsonReader.readObject();
+				res.setResponse(object);
 			}
-			out.write(res.getBytes());
+			out.write(jsonb.toJson(res).getBytes());
 			out.write(0x03); // ETX character
 		}
 	}

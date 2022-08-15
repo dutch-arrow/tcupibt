@@ -69,11 +69,6 @@ public class Terrarium {
 	public static final int ONPERIOD_OFF = 0;
 	public static int maxNrOfTraceDays = 30;
 
-//	public String[] deviceList   = {"light1", "light2", "light3", "light4", "uvlight", "light6", "pump", "sprayer", "mist", "fan_in", "fan_out"};
-//	public int[] timersPerDevice = {1,         1,        1,        1,        1,         1,        3,      5,         3,      3,        3       };
-//	public Timer[] timers;
-//	public Ruleset[] rulesets = new Ruleset[NR_OF_RULESETS];
-//	public SprayerRule sprayerRule;
 	public static TerrariumConfig cfg = new TerrariumConfig();
 	private static Map<String, Pin> devicePin;
 	private boolean sprayerRuleActive = false;
