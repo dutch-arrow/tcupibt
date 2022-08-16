@@ -18,6 +18,8 @@ import java.util.Properties;
 
 import javax.bluetooth.UUID;
 
+import com.pi4j.system.NetworkInfo;
+
 import nl.das.terraria.hw.LCD;
 import nl.das.terraria.objects.Terrarium;
 import nl.das.terraria.rest.BTServer;
@@ -42,7 +44,7 @@ public class TCU {
 		lcd.init(2, 16);
 		lcd.write(0, "Initialize....");
 
-		System.out.println(Util.getDateTimeString() + " Starting the Bluetooth service");
+		System.out.println(Util.getDateTimeString() + "Starting the Bluetooth service");
 		Thread svr = new Thread() {
 		    @Override
 			public void run(){
@@ -90,7 +92,16 @@ public class TCU {
 		int tterr = terrarium.getTerrariumTemperature();
 		int troom =  terrarium.getRoomTemperature();
 		lcd.displayLine1(troom, tterr);
-		String ip = "App: " + props.getProperty("host");
+		String ip="";
+		try {
+	        for (String ipAddress : NetworkInfo.getIPAddresses()) {
+	        	if (ipAddress.startsWith("192")) {
+	        		ip = ipAddress;
+	        	}
+	        }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		lcd.write(1, ip);
 		// Check timers if devices should be on
 		terrarium.initTimers(now);
@@ -119,9 +130,7 @@ public class TCU {
 					tterr = terrarium.getTerrariumTemperature();
 					troom = terrarium.getRoomTemperature();
 					lcd.displayLine1(troom, tterr);
-					if (!terrarium.isTraceOn()) {
-						Util.traceTemperature(Terrarium.traceFolder + "/" +  Terrarium.traceTempFilename, now, "r=%d t=%d", troom, tterr);
-					}
+					Util.traceTemperature(Terrarium.traceFolder + "/" +  Terrarium.traceTempFilename, now, "r=%d t=%d", troom, tterr);
 					// - check timers
 					terrarium.checkTimers();
 					// - check sprayerrule
