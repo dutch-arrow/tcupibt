@@ -33,4 +33,8 @@ build-job:       # This job runs in the build stage, which runs first.
   artifacts:
     paths:
       - target/tcubt.jar
+job:
+  tags:
+    - java
+    
 
