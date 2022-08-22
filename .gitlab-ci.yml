@@ -28,7 +28,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - mvn install:install-file -Dfile=lib/bluecove-emu-2.1.1-SNAPSHOT.jar -DgroupId=com.bluecove -DartifactId=bluecove-emu -Dversion=2.1.1-SNAPSHOT -Dpackaging=jar -DgeneratePom=true
     - mvn install:install-file -Dfile=lib/bluecove-gpl-2.1.1-SNAPSHOT.jar -DgroupId=com.bluecove -DartifactId=bluecove-gpl -Dversion=2.1.1-SNAPSHOT -Dpackaging=jar -DgeneratePom=true
     - echo "Compiling the code..."
-    - mvn package
+    - mvn package -Dmaven.test.skip=true
     - echo "Compile complete."
   artifacts:
     paths:
