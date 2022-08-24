@@ -170,6 +170,7 @@
 									</manifestEntries>
 								</transformer>
 							</transformers>
+							<outputDirectory>${basedir}</outputDirectory>
 							<finalName>${progName}</finalName>
 						</configuration>
 					</execution>

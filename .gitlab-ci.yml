@@ -32,7 +32,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - echo "Compile complete."
   artifacts:
     paths:
-      - target/tcubt.jar
+      - tcubt.jar
   tags:
     - java
     
