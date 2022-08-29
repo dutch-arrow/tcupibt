@@ -61,6 +61,7 @@ public class BTServer {
 
 	public void start() throws IOException {
 		while(true) {
+			LocalDevice.getLocalDevice().setDiscoverable(DiscoveryAgent.GIAC);
 			// Accept a new client connection
 			this.sc = this.scn.acceptAndOpen();
 			// New client connection accepted; get a handle on it
@@ -101,6 +102,9 @@ public class BTServer {
 				break;
 			}
 			case "setSensors": {
+				if (cmd.getData() == null) {
+					throw new CommandException("No data received.");
+				}
 				int rt = cmd.getData().getInt("roomtemp", 0);
 				if( rt == 0) {
 					throw new CommandException("Integer parameter 'roomtemp' not found.");
@@ -159,7 +163,7 @@ public class BTServer {
 				if ((per <= 0) || (per > 3600)) {
 					throw new CommandException("Integer parameter 'period' must be > 0 and < 3600 seconds.");
 				}
-				Terrarium.getInstance().setDeviceOn(prm, per);
+				Terrarium.getInstance().setDeviceOn(prm, Util.now(LocalDateTime.now()) + per);
 				break;
 			}
 			case "setDeviceManualOn": {
