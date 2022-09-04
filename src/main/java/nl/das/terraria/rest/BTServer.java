@@ -238,8 +238,7 @@ public class BTServer {
 				if (cmd.getData() == null) {
 					throw new CommandException("No data found.");
 				}
-				JsonReader jsonReader = Json.createReader(new StringReader(cmd.getData().getString("timers")));
-				JsonArray ja = jsonReader.readArray();
+				JsonArray ja = cmd.getData().getJsonArray("timers");
 				if (ja == null) {
 					throw new CommandException("JsonArray parameter 'timers' does not contain an array of Timer objects.");
 				}
@@ -263,8 +262,7 @@ public class BTServer {
 				break;
 			}
 			case "saveRuleset": {
-				JsonReader jsonReader = Json.createReader(new StringReader(cmd.getData().getString("ruleset")));
-				JsonObject obj = jsonReader.readObject();
+				JsonObject obj = cmd.getData().get("ruleset").asJsonObject();
 				if (obj == null) {
 					throw new CommandException("JsonObject parameter 'ruleset' not found.");
 				}
